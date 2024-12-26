@@ -4,6 +4,7 @@ import 'package:frontend/features/auth/cubit/auth_cubit.dart';
 import 'package:frontend/features/auth/pages/signup_page.dart';
 import 'package:frontend/features/auth/widgets/custom_auth_button.dart';
 import 'package:frontend/features/auth/widgets/custom_auth_text_field.dart';
+import 'package:frontend/features/home/pages/home.dart';
 
 class SigninPage extends StatefulWidget {
   static MaterialPageRoute route() =>
@@ -50,12 +51,8 @@ class _SigninPageState extends State<SigninPage> {
                   style: TextStyle(color: Colors.white),
                 )));
           } else if (state is AuthLoggedIn) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                backgroundColor: Colors.green,
-                content: Text(
-                  "Logged in successfully!",
-                  style: TextStyle(color: Colors.white),
-                )));
+            Navigator.pushReplacement(
+                context, MaterialPageRoute(builder: (context) => HomePage()));
           }
         },
         builder: (context, state) {

@@ -1,10 +1,12 @@
 import 'dart:convert';
 
 import 'package:frontend/core/constants/constants.dart';
+import 'package:frontend/core/services/shared_preferences.dart';
 import 'package:frontend/models/user_model.dart';
 import 'package:http/http.dart' as http;
 
 class AuthRemoteRepository {
+  final sharedPreferencesService = SharedPreferencesService();
   //sign up function
   Future<UserModel> signUp({
     required String name,
@@ -49,6 +51,33 @@ class AuthRemoteRepository {
       }
       return UserModel.fromJson(res.body);
     } catch (e) {
+      throw e.toString();
+    }
+  }
+
+  Future<UserModel> getUserData() async {
+    try {
+      final token = await sharedPreferencesService.getToken();
+      if (token == null) {
+        throw "Token not found";
+      }
+
+      final res = await http.get(
+          Uri.parse('${Constants.backendUrl}/api/auth/check-auth'),
+          headers: {
+            "Content-type": "application/json",
+            "x-auth-token": token,
+          });
+      if (res.statusCode != 200) {
+        throw jsonDecode(res.body)["message"];
+      }
+      final jsonData = jsonDecode(res.body);
+      final user = jsonData["user"];
+
+      print(jsonData["user"]);
+      return UserModel.fromJson(jsonEncode(user));
+    } catch (e) {
+      print(e.toString());
       throw e.toString();
     }
   }

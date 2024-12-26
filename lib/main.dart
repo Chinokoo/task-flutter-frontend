@@ -3,23 +3,40 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:frontend/features/auth/cubit/auth_cubit.dart';
 import 'package:frontend/features/auth/pages/signin_page.dart';
+import 'package:frontend/features/home/pages/home.dart';
 
 void main() async {
   await dotenv.load(fileName: ".env");
-  runApp(const MainApp());
+  runApp(MultiBlocProvider(
+    providers: [BlocProvider(create: (_) => AuthCubit())],
+    child: const MainApp(),
+  ));
 }
 
-class MainApp extends StatelessWidget {
+class MainApp extends StatefulWidget {
   const MainApp({super.key});
 
   @override
+  State<MainApp> createState() => _MainAppState();
+}
+
+class _MainAppState extends State<MainApp> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<AuthCubit>().getUserData();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [BlocProvider(create: (_) => AuthCubit())],
-      child: const MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: SigninPage(),
-      ),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: BlocBuilder<AuthCubit, AuthState>(builder: (context, state) {
+        if (state is AuthLoggedIn) {
+          return HomePage();
+        }
+        return const SigninPage();
+      }),
     );
   }
 }

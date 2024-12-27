@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:frontend/core/constants/constants.dart';
 import 'package:frontend/core/services/shared_preferences.dart';
+import 'package:frontend/features/auth/repository/auth_local_repository.dart';
 import 'package:frontend/models/user_model.dart';
 import 'package:http/http.dart' as http;
 
@@ -29,7 +30,6 @@ class AuthRemoteRepository {
       }
       return UserModel.fromJson(res.body);
     } catch (e) {
-      print(e.toString());
       throw e.toString();
     }
   }
@@ -69,15 +69,14 @@ class AuthRemoteRepository {
             "x-auth-token": token,
           });
       if (res.statusCode != 200) {
-        throw jsonDecode(res.body)["message"];
+        AuthLocalRepository().getUser();
+        // throw jsonDecode(res.body)["message"];
       }
       final jsonData = jsonDecode(res.body);
       final user = jsonData["user"];
 
-      print(jsonData["user"]);
       return UserModel.fromJson(jsonEncode(user));
     } catch (e) {
-      print(e.toString());
       throw e.toString();
     }
   }

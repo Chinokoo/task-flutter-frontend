@@ -4,17 +4,20 @@ class CustomAuthTextField extends StatelessWidget {
   final String hintText;
   final TextEditingController controller;
   final bool obscureText;
+  final int maxlines;
   const CustomAuthTextField(
       {super.key,
       required this.hintText,
       required this.obscureText,
-      required this.controller});
+      required this.controller,
+      this.maxlines = 1});
 
   @override
   Widget build(BuildContext context) {
     return TextField(
       controller: controller,
       obscureText: obscureText,
+      maxLines: maxlines,
       decoration: InputDecoration(
         contentPadding: const EdgeInsets.all(20),
         hintText: hintText,

@@ -16,17 +16,25 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       emit(AuthLoading());
       final userModel = await authRemoteRepository.getUserData();
-      await authLocalRepository.insertUser(userModel);
+      if (userModel.token.isNotEmpty) {
+        await authLocalRepository.insertUser(userModel);
 
-      emit(AuthLoggedIn(userModel));
+        emit(AuthLoggedIn(userModel));
 
-      await authLocalRepository.getUser();
+        await authLocalRepository.getUser();
+      } else {
+        await authLocalRepository.insertUser(userModel);
+        emit(AuthLoggedIn(userModel));
+      }
     } catch (e) {
-      print(e);
       final userModel = await authLocalRepository.getUser();
-      emit(AuthLoggedIn(userModel!));
+      if (userModel != null) {
+        emit(AuthLoggedIn(userModel));
+      } else {
+        emit(AuthError(e.toString()));
+      }
       emit(AuthInitial());
-      // emit(AuthError(e.toString()));
+      //
     }
   }
 
@@ -50,9 +58,8 @@ class AuthCubit extends Cubit<AuthState> {
       final userModel =
           await authRemoteRepository.signIn(email: email, password: password);
 
-      if (userModel.token.isNotEmpty) {
-        await sharedPreferencesService.setToken(userModel.token);
-      }
+      await sharedPreferencesService.setToken(userModel.token);
+
       await authLocalRepository.insertUser(userModel);
 
       emit(AuthLoggedIn(userModel));

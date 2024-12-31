@@ -49,6 +49,9 @@ class AuthRemoteRepository {
       if (res.statusCode != 200) {
         throw jsonDecode(res.body)["message"];
       }
+
+      final token = jsonDecode(res.body)["token"];
+      await sharedPreferencesService.setToken(token);
       return UserModel.fromJson(res.body);
     } catch (e) {
       throw e.toString();
@@ -58,10 +61,10 @@ class AuthRemoteRepository {
   Future<UserModel> getUserData() async {
     try {
       final token = await sharedPreferencesService.getToken();
-      if (token == null) {
-        throw "Token not found";
-      }
 
+      if (token == null) {
+        throw "User not authenticated";
+      }
       final res = await http.get(
           Uri.parse('${Constants.backendUrl}/api/auth/check-auth'),
           headers: {

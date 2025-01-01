@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/core/services/shared_preferences.dart';
 import 'package:frontend/core/utils/utils.dart';
 import 'package:frontend/features/add_task/pages/add_task.dart';
+import 'package:frontend/features/auth/pages/signin_page.dart';
 import 'package:frontend/features/auth/widgets/custom_auth_button.dart';
 import 'package:frontend/features/home/cubit/task_cubit.dart';
 import 'package:frontend/features/home/repository/task_remote_repository.dart';
@@ -22,7 +24,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   DateTime selectedDate = DateTime.now();
   TaskRemoteRepository taskRemoteRepository = TaskRemoteRepository();
-
+  SharedPreferencesService sharedPreferencesService =
+      SharedPreferencesService();
   @override
   void initState() {
     context.read<TaskCubit>().getTasks();
@@ -36,6 +39,13 @@ class _HomePageState extends State<HomePage> {
     context.read<TaskCubit>().getTasks();
   }
 
+  void logout() async {
+    await sharedPreferencesService.clearToken("x-auth-token");
+    if (!mounted) return;
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => SigninPage()));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,10 +56,7 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: [
           IconButton(
-            onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => AddTaskPage()));
-            },
+            onPressed: logout,
             icon: Icon(Icons.logout),
           ),
           IconButton(

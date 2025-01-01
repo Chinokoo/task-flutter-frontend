@@ -13,6 +13,8 @@ final class AuthLoggedIn extends AuthState {
   AuthLoggedIn(this.user);
 }
 
+final class AuthLoggedOut extends AuthState {}
+
 final class AuthError extends AuthState {
   final String error;
   AuthError(this.error);

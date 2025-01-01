@@ -12,4 +12,9 @@ class SharedPreferencesService {
     final preference = await SharedPreferences.getInstance();
     return preference.getString("x-auth-token");
   }
+
+  Future<void> clearToken(String token) async {
+    final preference = await SharedPreferences.getInstance();
+    await preference.remove("x-auth-token");
+  }
 }

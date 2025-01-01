@@ -12,21 +12,31 @@ class AuthCubit extends Cubit<AuthState> {
   final authLocalRepository = AuthLocalRepository();
   final sharedPreferencesService = SharedPreferencesService();
 
+  void logout() async {
+    await sharedPreferencesService.clearToken("x-auth-token");
+    emit(AuthLoggedOut());
+  }
+
   void getUserData() async {
     try {
-      emit(AuthLoading());
-      final userModel = await authRemoteRepository.getUserData();
-      if (userModel.token.isNotEmpty) {
-        await authLocalRepository.insertUser(userModel);
-
-        emit(AuthLoggedIn(userModel));
-
-        await authLocalRepository.getUser();
+      final token = await sharedPreferencesService.getToken();
+      if (token == null) {
+        emit(AuthInitial());
       } else {
-        await authLocalRepository.insertUser(userModel);
+        emit(AuthLoading());
+        final userModel = await authRemoteRepository.getUserData();
+        if (userModel.token.isNotEmpty) {
+          await authLocalRepository.insertUser(userModel);
+
+          emit(AuthLoggedIn(userModel));
+
+          await authLocalRepository.getUser();
+        } else {
+          await authLocalRepository.insertUser(userModel);
+          emit(AuthLoggedIn(userModel));
+        }
         emit(AuthLoggedIn(userModel));
       }
-      emit(AuthLoggedIn(userModel));
     } catch (e) {
       final userModel = await authLocalRepository.getUser();
       if (userModel != null) {
@@ -35,7 +45,6 @@ class AuthCubit extends Cubit<AuthState> {
         emit(AuthError(e.toString()));
       }
       emit(AuthInitial());
-      //
     }
   }
 
@@ -58,8 +67,9 @@ class AuthCubit extends Cubit<AuthState> {
       emit(AuthLoading());
       final userModel =
           await authRemoteRepository.signIn(email: email, password: password);
+      final token = userModel.token;
 
-      await sharedPreferencesService.setToken(userModel.token);
+      await sharedPreferencesService.setToken(token);
 
       await authLocalRepository.insertUser(userModel);
 

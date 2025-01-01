@@ -77,16 +77,20 @@ class TaskRemoteRepository {
   Future<void> deleteTask(String id) async {
     try {
       final token = await sharedPreferencesService.getToken();
+      if (token == null) {
+        throw "User not authenticated";
+      }
       http.Response res = await http
           .delete(Uri.parse("${Constants.backendUrl}/api/tasks/$id"), headers: {
         "Content-type": "application/json",
-        "x-auth-token": token!,
+        "x-auth-token": token,
       });
+
+      await taskLocalRepository.deleteTask(id);
 
       if (res.statusCode != 200) {
         throw jsonDecode(res.body)["message"];
       }
-      String message = jsonDecode(res.body)["message"];
     } catch (e) {
       throw e.toString();
     }

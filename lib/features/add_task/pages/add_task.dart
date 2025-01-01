@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/features/auth/widgets/custom_auth_button.dart';
 import 'package:frontend/features/auth/widgets/custom_auth_text_field.dart';
 import 'package:frontend/features/home/cubit/task_cubit.dart';
+import 'package:frontend/features/home/repository/task_local_repository.dart';
 import 'package:frontend/features/home/repository/task_remote_repository.dart';
 import 'package:intl/intl.dart';
 
@@ -31,6 +32,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
   }
 
   void createTask() async {
+    await TaskLocalRepository().showTableColumns();
     await context.read<TaskCubit>().createTask(
           title: titleController.text.trim(),
           description: descriptionController.text.trim(),

@@ -53,14 +53,4 @@ class AuthLocalRepository {
     }
     return null;
   }
-
-  Future<void> showTableColumns() async {
-    final db = await database;
-
-    final tableInfo = await db.rawQuery('PRAGMA table_info(users)');
-
-    for (final row in tableInfo) {
-      print('Column: ${row['name']}, Type: ${row['type']}');
-    }
-  }
 }

@@ -34,9 +34,10 @@
 - press on the task
 
 <img src="assets/delete task.png" width="300" alt="delete task" />
-  [Insert API documentation for task creation, reading, updating, and deletion]
-  Contributing
-  Contributions are welcome! If you'd like to contribute to this project, please fork the repository and submit a pull request.
+  
+  ## Contributing
+
+- Contributions are welcome! If you'd like to contribute to this project, please fork the repository and submit a pull request.
 
 ## License
 

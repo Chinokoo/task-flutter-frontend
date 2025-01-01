@@ -31,6 +31,7 @@ class _HomePageState extends State<HomePage> {
 
   void deleteTask(String id) async {
     await taskRemoteRepository.deleteTask(id);
+    if (!mounted) return;
     Navigator.pop(context);
     context.read<TaskCubit>().getTasks();
   }
@@ -49,8 +50,15 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => AddTaskPage()));
             },
+            icon: Icon(Icons.logout),
+          ),
+          IconButton(
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => AddTaskPage()));
+            },
             icon: Icon(Icons.add),
-          )
+          ),
         ],
       ),
       body: BlocBuilder<TaskCubit, TaskCubitState>(
